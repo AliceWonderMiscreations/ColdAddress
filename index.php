@@ -82,14 +82,18 @@ if(isset($_POST['passphrase'])) {
 }
 
 if(strlen($salt) < 96) {
-  print('The salt must be at least 96 characters.');
-  exit;
-}
-
-$test = array_unique(str_split($salt));
-if(count($test) < 28) {
-  print('The salt must have at least 28 unique characters in it.');
-  exit;
+  //print('The salt must be at least 96 characters.');
+  //exit;
+  $ERROR = 'The salt must be at least 96 characters.';
+  $badsalt = TRUE;
+} else {
+  $test = array_unique(str_split($salt));
+  if(count($test) < 28) {
+    //print('The salt must have at least 28 unique characters in it.');
+    //exit;
+    $ERROR = 'The salt must have at least 28 unique characters in it.';
+    $badsalt = TRUE;
+  }
 }
 
 // hash the salt twice to enlarge it
@@ -254,7 +258,14 @@ if(! isset($BROKEN)) {
   $input->setAttribute('value', 'Submit');
   $form->appendChild($input);
   
-  if(! $TEST) {
+  $SHOWRES = TRUE;
+  if(isset($badsalt)) {
+    $SHOWRES = FALSE;
+  }
+  if($TEST) {
+    $SHOWRES = FALSE;
+  }
+  if($SHOWRES) {
     $passphrase = preg_replace('/&/', '&amp;', $passphrase);
     $section = $dom->createElement('section');
     $article->appendChild($section);
@@ -652,7 +663,11 @@ $text = $dom->createTextNode(' more difficult to import the private ECDSA key in
 $p->appendChild($text);
 $csubsection->appendChild($p);
 
+$p = $dom->createElement('p', 'This web application provides a mechanism for generating Pass Phrase style cold addresses.');
+$csubsection->appendChild($p);
+
 $p = $dom->createElement('p', 'This solution should only be used by people who either are technically inclined or have a genuine interest in learning.');
+$csubsection->appendChild($p);
 
 $subsection = $dom->createElement('section');
 $subsection->setAttribute('id', 'install');
@@ -708,7 +723,7 @@ $subsection->appendChild($p);
 $p = $dom->createElement('p', 'The salt is defined in the file ');
 $code = $dom->createElement('code', 'salt.inc.php');
 $p->appendChild($code);
-$text = $dom->createTextNode(' and is empty by default. The custom salt you create needs to be at least 96 characters in length and should have at least 28 unique characters in in. This is what the contents of that file looks like as distributed:');
+$text = $dom->createTextNode(' and is empty by default. The custom salt you create needs to be at least 96 characters in length and should have at least 28 unique characters in it. This is what the contents of that file looks like as distributed:');
 $p->appendChild($text);
 $subsection->appendChild($p);
 
@@ -796,10 +811,10 @@ $code = $dom->createElement('code', 'A long time ago in a galaxy far far away');
 $blockquote->appendChild($code);
 $subsection->appendChild($blockquote);
 
-$p = $dom->createElement('p', 'That makes a very poor pass phrase because it a common string. If an attacker was to discover what your salt it, that phrase (and variations of it) very well may be tried to see if they can discover a private ECDSA key that has value associated with it.');
+$p = $dom->createElement('p', 'That makes a very poor pass phrase because it a common string. If an attacker was to discover what your salt is, that phrase (and variations of it) very well may be tried to see if they can discover a private ECDSA key that has value associated with it.');
 $subsection->appendChild($p);
 
-$p = $dom->createElement('p', 'On the other hand the phrase');
+$p = $dom->createElement('p', 'On the other hand the phrase:');
 $subsection->appendChild($p);
 
 $blockquote = $dom->createElement('blockquote');
@@ -884,12 +899,15 @@ $subsection->appendChild($list);
 
 $item = $dom->createElement('li', 'Write a pass phrase down on a 3x5 card. I like to use a thin point Sharpie. Write the same pass phrase down on a second 3x5 card. Remember the pass phrase must have at least six words separated by spaces and are case sensitive.');
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
 $item = $dom->createElement('li', 'Scrutinize the two 3x5 cards to make sure the pass phrases are identical and easy to read.');
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
 $item = $dom->createElement('li', 'Enter the pass phrase into the form for generating the addresses and click submit.');
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
 $item = $dom->createElement('li', 'Scrutinize the entered pass phrase to make sure it matches what is on the cards. The entered pass phrase as the address generator saw it will have a ');
 $span = $dom->createElement('span', 'MistyRose');
@@ -898,9 +916,11 @@ $item->appendChild($span);
 $text = $dom->createTextNode(' colored background.');
 $item->appendChild($text);
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
 $item = $dom->createElement('li', 'Assuming everything matches, put each of the 3x5 cards into a security envelope. I use Mead brand No. 6¾ Security Envelopes. They are a good size for 3x5 cards.');
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
 $item = $dom->createElement('li', 'On a third 3x5 card, write down the generated Base58 Check Encoding Address. It will have a ');
 $span = $dom->createElement('span', 'Yellow');
@@ -909,11 +929,13 @@ $item->appendChild($span);
 $text = $dom->createTextNode(' colored background.');
 $item->appendChild($text);
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
-$item = $dom->createElement('p', 'Scrutinize the address you wrote down to make sure it matches what is on the screen.');
+$item = $dom->createElement('li', 'Scrutinize the address you wrote down to make sure it matches what is on the screen.');
 $list->appendChild($item);
+$item->setAttribute('style', 'margin-bottom: 0.4em;');
 
-$item = $dom->createElement('p', 'Write the same Base58 Check Encoding Address on the outside of the two envelopes.');
+$item = $dom->createElement('li', 'Write the same Base58 Check Encoding Address on the outside of the two envelopes.');
 $list->appendChild($item);
 
 $p = $dom->createElement('p', 'Repeat the above process for each cold address you want to create. When you are finished, you should have two envelopes for each cold address and a 3x5 card with just the Base58 address for each cold address.');
@@ -928,7 +950,7 @@ $subsection->appendChild($p);
 $p = $dom->createElement('p', 'When you want to deposit value into a cold address, simply make a payment to one of the addresses on one of the 3x5 cards. I personally like to only make payments of 0.5 BTC at a time, putting a mark on the 3x5 each time I do so that I always know a payment has been made to that address.');
 $subsection->appendChild($p);
 
-$p = $dom->createElement('p', 'My personal plan is to rotate through each card until I have made a 0.5 BTC payments to the cold address on each card. Then I will rotate through the cards again. If I ever am prosperous enough that each cold address has 10 BTC of value associated with it, I will probably create a new set to start making payments to. That time is a long ways away, I am not wealthy enough for that to be a concern anytime soon.');
+$p = $dom->createElement('p', 'My personal plan is to rotate through each card until I have made a 0.5 BTC payments to the cold address on each card. Then I will rotate through the cards again. If I ever am prosperous enough that each cold address has 10 BTC of value associated with it (indicated by 20 marks), I will probably create a new set to start making payments to. That time is a long ways away, I am not wealthy enough for that to be a concern anytime soon.');
 $subsection->appendChild($p);
 
 $p = $dom->createElement('p', 'Limiting the payments to 0.5 BTC means that when I do import the private ECDSA key for a particular cold address, the transactions associated with that address are not so huge that spending from them results in the a bulk of their value being tied up in a change address that needs to wait for confirmations before it can be spent.');
@@ -945,20 +967,29 @@ $p = $dom->createElement('p', 'The private ECDSA key is never written down. When
 $csubsection->appendChild($p);
 
 
+$subsection = $dom->createElement('section');
+$subsection->setAttribute('id', 'legacy');
+$section->appendChild($subsection);
+$h = $dom->createElement('h3', 'Financial Legacy');
+$subsection->appendChild($h);
 
+$li = $dom->createElement('li');
+$a = $dom->createElement('a', 'Financial Legacy');
+$a->setAttribute('href', '#legacy');
+$li->appendChild($a);
+$toc->appendChild($li);
 
+$p = $dom->createElement('p', 'We all want to live forever. Well most of us want to live forever. Few of us actually do, and we often can not predict when something will happen to us.');
+$subsection->appendChild($p);
 
+$p = $dom->createElement('p', 'Make sure you leave instructions for your heirs on where your cold address pass phrases are stored and where your salt is backed up and instructions on how to generate the private ECDSA keys from the pass phrases.');
+$subsection->appendChild($p);
 
+$p = $dom->createElement('p', 'It is important to note that since a Bitcoin address is not linked to an identity in the block chain, it will be very difficult if not impossible for the IRS or other government institution to determine that value from the cold addresses was inherited. Therefore your heirs should be made aware that they need to declare it as inherited for tax purposes or the government may not be able to claim their share of your hard-earned value.');
+$subsection->appendChild($p);
 
-
-
-
-
-
-
-
-
-
+$p = $dom->createElement('p', 'This is especially important if they are going to be sent through a mixing service, that makes it almost impossible for the government to determine it was inherited if the heirs do not disclose it to them.');
+$subsection->appendChild($p);
 
 
 $subsection = $dom->createElement('section');
@@ -1007,6 +1038,13 @@ $subsection->appendChild($pre);
 $p = $dom->createElement('p', 'That will decrypt your wallet for 10 minutes (600 seconds) assuming that you entered the correct wallet pass phrase. It will give you an error message if you did not.');
 $subsection->appendChild($p);
 
+$figure = $dom->createElement('figure');
+$subsection->appendChild($figure);
+$img = $dom->createElement('img');
+$img->setAttribute('src', 'unlock.png');
+$img->setAttribute('alt', '[Unlocking wallet in Bitcoin Core console]');
+$figure->appendChild($img);
+
 $p = $dom->createElement('p', 'Next, import the private ECDSA with the following command:');
 $subsection->appendChild($p);
 
@@ -1022,8 +1060,22 @@ $text = $dom->createTextNode(' with the actual private ECDSA key in the Wallet I
 $p->appendChild($text);
 $subsection->appendChild($p);
 
+$figure = $dom->createElement('figure');
+$subsection->appendChild($figure);
+$img = $dom->createElement('img');
+$img->setAttribute('src', 'import.png');
+$img->setAttribute('alt', '[Importing private key in Bitcoin Core console]');
+$figure->appendChild($img);
+
 $p = $dom->createElement('p', 'This will trigger the client to re-scan the block chain, so it will take a few minutes. When it is done, any value associated with that key should now be available in the client.');
 $subsection->appendChild($p);
+
+$figure = $dom->createElement('figure');
+$subsection->appendChild($figure);
+$img = $dom->createElement('img');
+$img->setAttribute('src', 'scanning.png');
+$img->setAttribute('alt', '[Bitcoin Core rescanning the block chain]');
+$figure->appendChild($img);
 
 $p = $dom->createElement('p', 'Now lock the wallet again with the following command:');
 $subsection->appendChild($p);
@@ -1033,19 +1085,32 @@ $pre = $dom->createElement('pre', $string);
 $pre->setAttribute('style', 'color: green;');
 $subsection->appendChild($pre);
 
-$p = $dom->createElement('p', 'Clear the console by clicking on the circle in the bottom right hand corner of the Console. It is very important to do this, the console shows your pass phrase is in plain text and does not clear itself when you close the debug window.');
+$figure = $dom->createElement('figure');
+$subsection->appendChild($figure);
+$img = $dom->createElement('img');
+$img->setAttribute('src', 'lock.png');
+$img->setAttribute('alt', '[Locking wallet in Bitcoin Core console]');
+$figure->appendChild($img);
+
+$p = $dom->createElement('p', 'Next clear the console. You can do this either by typing ');
+$code = $dom->createElement('code', 'Ctrl-L');
+$p->appendChild($code);
+$text = $dom->createTextNode(' into the console or by clicking on the circle in the bottom right hand corner of the Console. It is very important to do this, the console shows your pass phrase is in plain text and does not clear itself when you close the debug window.');
+$p->appendChild($text);
 $subsection->appendChild($p);
+
+$figure = $dom->createElement('figure');
+$subsection->appendChild($figure);
+$img = $dom->createElement('img');
+$img->setAttribute('src', 'clear.png');
+$img->setAttribute('alt', '[Button to clear the Bitcoin Core console]');
+$figure->appendChild($img);
 
 $p = $dom->createElement('p', 'Finally, make another backup of the wallet now that it has the new address imported into it.');
 $subsection->appendChild($p);
 
 $p = $dom->createElement('p', 'It is important to note that the address you just imported is no longer a cold address. Any value sent to that address will show up in your software wallet.');
 $subsection->appendChild($p);
-
-
-
-
-
 
 } //end if showdoc
 
