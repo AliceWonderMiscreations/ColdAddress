@@ -18,28 +18,6 @@ $docstring = '<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html><html><head><
 $dom->loadXML($docstring);
 $body = $dom->getElementsByTagName('body')->item(0);
 
-$footer = $dom->createElement('footer');
-$footer->setAttribute('id', 'footer');
-$footer->setAttribute('style', 'background-color: black; color: white; text-align: center; padding: 1em;');
-$p = $dom->createElement('p', 'The author of this software and documentation is not a trained or licensed financial advisor.');
-$footer->appendChild($p);
-$p = $dom->createElement('p', 'Use of Bitcoin and this software are at your own risk.');
-$footer->appendChild($p);
-$p = $dom->createElement('p', 'If you find this useful, bitcoin donations of any amount are appreciated:');
-$br = $dom->createElement('br');
-$a = $dom->createElement('a', $donation);
-$a->setAttribute('href', 'bitcoin:1KutggwB8VLGKTx7mgxrfiJusWCx2CWtFW');
-$p->appendChild($br);
-$p->appendChild($a);
-$footer->appendChild($p);
-$p = $dom->createElement('p', 'If you use this instead of a Trezor, I just saved you $99.00 USD.');
-$br = $dom->createElement('br');
-$p->appendChild($br);
-$text = $dom->createTextNode('5 mBTC (.005 BTC) is the suggested gratitude. But only if you really find this useful.');
-$p->appendChild($text);
-$footer->appendChild($p);
-
-
 if(! isset($salt)) {
   $salt='';
 }
@@ -1111,11 +1089,50 @@ $subsection->appendChild($p);
 
 $p = $dom->createElement('p', 'It is important to note that the address you just imported is no longer a cold address. Any value sent to that address will show up in your software wallet.');
 $subsection->appendChild($p);
-
+$SHOWFOOT = TRUE;
+} else {
+  $p = $dom->createElement('p', 'Documentation is available at ');
+  $a = $dom->createElement('a', 'https://bitcoin.librelamp.com/address.php');
+  $a->setAttribute('href', 'https://bitcoin.librelamp.com/address.php');
+  $a->setAttribute('target', '_blank');
+  $a->setAttribute('title', '[Opens new window]');
+  $p->appendChild($a);
+  $article->appendChild($p);
 } //end if showdoc
 
-// send the page
+if(! isset($SHOWFOOT)) {
+  $SHOWFOOT = FALSE;
+  if($SHOWRES) {
+    $SHOWFOOT = TRUE;
+  }
+}
+
+if($SHOWFOOT) {
+$footer = $dom->createElement('footer');
+$footer->setAttribute('id', 'footer');
+$footer->setAttribute('style', 'background-color: black; color: white; text-align: center; padding: 1em;');
+$p = $dom->createElement('p', 'The author of this software and documentation is not a trained or licensed financial advisor.');
+$footer->appendChild($p);
+$p = $dom->createElement('p', 'Use of Bitcoin and this software are at your own risk.');
+$footer->appendChild($p);
+$p = $dom->createElement('p', 'If you find this useful, bitcoin donations of any amount are appreciated:');
+$br = $dom->createElement('br');
+$a = $dom->createElement('a', $donation);
+$a->setAttribute('href', 'bitcoin:1KutggwB8VLGKTx7mgxrfiJusWCx2CWtFW');
+$p->appendChild($br);
+$p->appendChild($a);
+$footer->appendChild($p);
+$p = $dom->createElement('p', 'If you use this instead of a Trezor, I just saved you $99.00 USD.');
+$br = $dom->createElement('br');
+$p->appendChild($br);
+$text = $dom->createTextNode('5 mBTC (.005 BTC) is the suggested gratitude. But only if you really find this useful.');
+$p->appendChild($text);
+$footer->appendChild($p);
 $body->appendChild($footer);
+}
+
+// send the page
+
 $html = $dom->getElementsByTagName('html')->item(0);
 $html->setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
 $html->setAttributeNS('http://www.w3.org/XML/1998/namespace', 'xml:lang', 'en');
